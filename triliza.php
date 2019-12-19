@@ -12,6 +12,7 @@
 	
 		$(document).ready(function()
 		{	
+			var Ttable=new Array(2);
 			var id,xo;
 			var obj;
 			$("#btn").click(function()
@@ -29,7 +30,45 @@
 				});
 				
 			});
+			
+			function printTable()
+			{
+				var ttt;
+		
+  				$.ajax({url: "printTable.php", success: function(result)
+					{
+						ttt = JSON.parse(result);	
+				
+						for ( i=0; ttt.length; i++)
+						{
+								var x=ttt[i].posX;
+								var y=ttt[i].posY;
+								Ttable[x][y]=xo;
+						
+						}
+					
+						$("game").html("<th style='border-right:1px solid #ddd;border-bottom: 1px solid #ddd' >"+Ttable[0][0]"+</th><th style='border-right:1px solid #ddd;border-left:1px solid #ddd;border-bottom: 1px solid #ddd' >"+Ttable[0][1]+"</th><th style='border-left:1px solid #ddd;border-bottom: 1px solid #ddd' >"+Ttable[0][2]+"</th></tr><tr><th style='border-right:1px solid #ddd;border-bottom: 1px solid #ddd' >"+Ttable[1][0]+"</th><th style='border-right:1px solid #ddd;border-left:1px solid #ddd;border-bottom: 1px solid #ddd'  >"+Ttable[1][1]+"</th><th style='border-left:1px solid #ddd;border-bottom: 1px solid #ddd' >"+Ttable[1][2]+"</th></tr><tr><th style='border-right:1px solid #ddd' >"+Ttable[2][0]+"</th><th style='border-right:1px solid #ddd;border-left:1px solid #ddd' "+Ttable[2][1]+">-</th><th style='border-left:1px solid #ddd' "+Ttable[2][2]+" >-</th></tr>"); 
+					
+					}
+				});
+			}
+			
+			function playPos(x,y)
+			{	
+				$.post("playPos.php",
+				{
+					posX: x,
+					posY: y
+				},
+				function(data, status){
+						
+				});	
+				
+				printTable();
+				}
+			
 		});
+		
 				
 		
 	
@@ -39,22 +78,22 @@
 <body>
 	
 	
-	<table >
+	<table id="game">
 		<tr>
-    <th style="border-right:1px solid #ddd;border-bottom: 1px solid #ddd">-</th>
-    <th style="border-right:1px solid #ddd;border-left:1px solid #ddd;border-bottom: 1px solid #ddd">-</th>
-    <th style="border-left:1px solid #ddd;border-bottom: 1px solid #ddd">-</th>
-  </tr>
+			<th style="border-right:1px solid #ddd;border-bottom: 1px solid #ddd" id="[0][0]">-</th>
+			<th style="border-right:1px solid #ddd;border-left:1px solid #ddd;border-bottom: 1px solid #ddd" id="[0][1]">-</th>
+			<th style="border-left:1px solid #ddd;border-bottom: 1px solid #ddd" id="[0][2]">-</th>
+  		</tr>
 		<tr>
-    <th style="border-right:1px solid #ddd;border-bottom: 1px solid #ddd">-</th>
-    <th style="border-right:1px solid #ddd;border-left:1px solid #ddd;border-bottom: 1px solid #ddd">-</th>
-    <th style="border-left:1px solid #ddd;border-bottom: 1px solid #ddd">-</th>
-  </tr>
+			<th style="border-right:1px solid #ddd;border-bottom: 1px solid #ddd" id="[1][0]">-</th>
+			<th style="border-right:1px solid #ddd;border-left:1px solid #ddd;border-bottom: 1px solid #ddd" id="[1][1]">-</th>
+			<th style="border-left:1px solid #ddd;border-bottom: 1px solid #ddd" id="[1][2]">-</th>
+  		</tr>
 		<tr>
-    <th style="border-right:1px solid #ddd">-</th>
-    <th style="border-right:1px solid #ddd;border-left:1px solid #ddd">-</th>
-    <th style="border-left:1px solid #ddd">-</th>
-  </tr>
+			<th style="border-right:1px solid #ddd" id="[2][0]">-</th>
+			<th style="border-right:1px solid #ddd;border-left:1px solid #ddd" id="[2][1]">-</th>
+			<th style="border-left:1px solid #ddd" id="[2][2]">-</th>
+  		</tr>
 	</table>
 	
 	
@@ -63,7 +102,8 @@
 	{
 		echo "<form id='form'><input type='text' id='namebox' name='name'><input type='button' id='btn' value='PLAY!''></form>";
 	}
-	?>  
+	?>
+	
 	<p id="gameID"></p>
 </body>
 </html>
