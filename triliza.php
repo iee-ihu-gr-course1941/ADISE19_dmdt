@@ -5,7 +5,7 @@
 <title>Untitled Document</title>
 	<?php 
 	session_start();
-	//unset($_SESSION["gameID"]);
+	//unset($_SESSION["gameID"]);     FOR TESTING REASONS
 	//echo $_SESSION["name"];
 	?>
 	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
@@ -18,7 +18,7 @@
 			var obj;
 			var turn;
 			
-			$("#btn").click(function()  //Otan patiete to koumpi kai ksekinaei to game ... prepei na valoume interval gia updateGame()
+			$("#btn").click(function()  //Otan patiete to koumpi kai ksekinaei to game ... prepei na valoume interval gia updateGame() einai jquery function
 			{
 				var nametxt=$("#namebox").val();
 				
@@ -51,12 +51,13 @@
 						}
 					
 						$("game").html("<th style='border-right:1px solid #ddd;border-bottom: 1px solid #ddd' >"+Ttable[0][0]"+</th><th style='border-right:1px solid #ddd;border-left:1px solid #ddd;border-bottom: 1px solid #ddd' >"+Ttable[0][1]+"</th><th style='border-left:1px solid #ddd;border-bottom: 1px solid #ddd' >"+Ttable[0][2]+"</th></tr><tr><th style='border-right:1px solid #ddd;border-bottom: 1px solid #ddd' >"+Ttable[1][0]+"</th><th style='border-right:1px solid #ddd;border-left:1px solid #ddd;border-bottom: 1px solid #ddd'  >"+Ttable[1][1]+"</th><th style='border-left:1px solid #ddd;border-bottom: 1px solid #ddd' >"+Ttable[1][2]+"</th></tr><tr><th style='border-right:1px solid #ddd' >"+Ttable[2][0]+"</th><th style='border-right:1px solid #ddd;border-left:1px solid #ddd' "+Ttable[2][1]+">-</th><th style='border-left:1px solid #ddd' "+Ttable[2][2]+" >-</th></tr>"); 
+						// etsi gyfte emfanizete o pinakas stin selida
 					
 					}
 				});
 			}
 			
-			function playPos(x,y) // Paizei to position pou tou dothike
+			function playPos(x,y) // Paizei to position pou tou dothike kai enimerwnei ton pinaka 
 			{	
 				$.post("playPos.php",
 				{
@@ -87,6 +88,11 @@
 			{
 				printTable();
 				getTurn();
+			}
+			
+			function dropGame() // kanei unset to gameID session kai thetei to game se ended
+			{
+				$.ajax({url: "dropGame.php"});
 			}
 		
 	
