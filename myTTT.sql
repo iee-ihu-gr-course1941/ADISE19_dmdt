@@ -10,6 +10,7 @@ CREATE TABLE `Game`
     `playery` varchar(100),
     `result` enum('X','O','D') DEFAULT NULL,
     `last_change` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+	`turn`  enum('X','O') DEFAULT 'X',
 	PRIMARY KEY (`ID`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
