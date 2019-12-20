@@ -5,6 +5,8 @@
 <title>Untitled Document</title>
 </head>
 <?php 
+	session_start();
+	include "dbconnect.php";
 	
 	$X=$_POST["posX"];
 	$Y=$_POST["posY"];

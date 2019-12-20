@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <title>Untitled Document</title>
-	<?php session_start();
-	unset($_SESSION["gameID"]);
-	echo $_SESSION["name"];
+	<?php 
+	session_start();
+	//unset($_SESSION["gameID"]);
+	//echo $_SESSION["name"];
 	?>
 	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
 	<script>
@@ -15,7 +16,9 @@
 			var Ttable=new Array(2);
 			var id,xo;
 			var obj;
-			$("#btn").click(function()
+			var turn;
+			
+			$("#btn").click(function()  //Otan patiete to koumpi kai ksekinaei to game ... prepei na valoume interval gia updateGame()
 			{
 				var nametxt=$("#namebox").val();
 				
@@ -31,13 +34,13 @@
 				
 			});
 			
-			function printTable()
+			function printTable() // emfanizei ton pinaka me oti move exei ginei kai ta apothikevei sto 2d pinaka 3x3 Ttable
 			{
-				var ttt;
+				var temp;
 		
   				$.ajax({url: "printTable.php", success: function(result)
 					{
-						ttt = JSON.parse(result);	
+						temp = JSON.parse(result);	
 				
 						for ( i=0; ttt.length; i++)
 						{
@@ -53,7 +56,7 @@
 				});
 			}
 			
-			function playPos(x,y)
+			function playPos(x,y) // Paizei to position pou tou dothike
 			{	
 				$.post("playPos.php",
 				{
@@ -67,9 +70,24 @@
 				printTable();
 				}
 			
-		});
-		
-				
+			function getTurn() // pairnei to turn to game to game id dinete me session
+			{	
+				var temp;
+				$.ajax({url: "getTurn.php", success: function(result)
+					{
+						temp = JSON.parse(result);	
+						turn=temp.turn;
+							
+					}
+			
+				});
+			}
+			
+			function updateGame() // h function poy xrisimopioume me interval kai enimeronei to game
+			{
+				printTable();
+				getTurn();
+			}
 		
 	
 	</script>
