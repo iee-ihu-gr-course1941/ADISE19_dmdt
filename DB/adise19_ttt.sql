@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 21, 2019 at 04:46 AM
+-- Generation Time: Dec 23, 2019 at 11:26 PM
 -- Server version: 10.4.8-MariaDB
 -- PHP Version: 7.3.11
 
@@ -52,6 +52,16 @@ CREATE TABLE `game` (
   `last_change` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `turn` enum('X','O') DEFAULT 'X'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Triggers `game`
+--
+DELIMITER $$
+CREATE TRIGGER `insert_board` AFTER INSERT ON `game` FOR EACH ROW BEGIN
+	insert into moves (game_id,posX,posY) values (new.id ,1,1),(new.id ,1,2),(new.id ,1,3),(new.id ,2,1),(new.id ,2,2),(new.id ,2,3),(new.id ,3,1),(new.id ,3,2),(new.id ,3,3);
+    END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -110,7 +120,7 @@ ALTER TABLE `players`
 -- AUTO_INCREMENT for table `game`
 --
 ALTER TABLE `game`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `players`
