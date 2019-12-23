@@ -76,7 +76,8 @@ CREATE TABLE `players` (
   `id` int(11) NOT NULL,
   `name` varchar(100) DEFAULT NULL,
   `won` int(11) NOT NULL DEFAULT 0,
-  `lost` int(11) NOT NULL DEFAULT 0
+  `lost` int(11) NOT NULL DEFAULT 0,
+  `token` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
