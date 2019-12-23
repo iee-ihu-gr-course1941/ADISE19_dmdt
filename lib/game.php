@@ -54,13 +54,13 @@ function show_status($input) {
 function check_abort($id) {
 	global $mysqli;
 	
-	$sql = "update game set status='aborded', result=if(p_turn='W','B','W'),turn=null where p_turn is not null and last_change<(now()-INTERVAL 5 MINUTE) and status='started' and ID=$id";
+	$sql = "update game set status='aborded', result=if(p_turn='X','O','X'),turn=null where p_turn is not null and last_change<(now()-INTERVAL 5 MINUTE) and status='started' and ID=$id";
 	$st = $mysqli->prepare($sql);
 	$r = $st->execute();
 }
 
 
-function start_game()
+function start_game($input)
 {
 	global $mysqli;
 	
