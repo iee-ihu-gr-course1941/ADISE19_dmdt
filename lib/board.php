@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 function show_board() {
 	
@@ -39,7 +40,8 @@ function play_pos(){
 	
 	$X=$_POST["posX"];
 	$Y=$_POST["posY"];
-	$sql="INSERT INTO moves(game,player,posX,posY) VALUES (".$_SESSION['gameID'].",".$_SESSION['name'].",$X,$Y)";
+	//$sql="INSERT INTO moves(game,player,posX,posY) VALUES (".$_SESSION['gameID'].",".$_SESSION['name'].",$X,$Y)";
+    $sql="UPDATE  moves set piece VALUES (".$_SESSION['gameID'].",".$_SESSION['XO'].",$X,$Y)";
 	
 	$mysqli->query($sql);
 }
@@ -62,6 +64,7 @@ function start_game()
 		$id = $mysqli->insert_id;
 		$info["gameID"]=$id;
 		$info["XO"]="X";
+        $_SESSION["XO"]="X";
 		echo json_encode($info);
 	}
 	else
@@ -71,6 +74,7 @@ function start_game()
 		$mysqli->query($sql);
 		$info["gameID"]=$id;
 		$info["XO"]="O";
+        $_SESSION["XO"]="O";
 		echo json_encode($info);
 
 	
