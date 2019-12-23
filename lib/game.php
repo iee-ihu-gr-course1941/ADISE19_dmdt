@@ -1,11 +1,48 @@
 <?php
+function findPlayerPiece($token)
+{
+	$sql = "select count(*) as count from game where (playerx='".$input['token']."' and status='started'";
+	$st = $mysqli->prepare($sql);
+	$res = $st->get_result();
+	$r = $res->fetch_all(MYSQLI_ASSOC);
+	if (r[0]['count']>0)
+		return "X";
+	$sql = "select count(*) as count from game where (playery='".$input['token']."' and status='started'";
+	$st = $mysqli->prepare($sql);
+	$res = $st->get_result();
+	$r = $res->fetch_all(MYSQLI_ASSOC);
+	if (r[0]['count']>0)
+		return "Y";
+}
+function wonGame($input)
+{
+	$sql="update game set status='ended',result='".findPlayerPiece($input['token'])."'";
+	$st = $mysqli->prepare($sql);
+	$r = $st->execute();
+}
+function gameupdate($input)
+{
+	global $mysqli;
+	
+	
+	$sql = "select count(*) as count,id from game where (playerx='".$input['token']."' or playery='".$input['token']."') and status='started'";
+	$st = $mysqli->prepare($sql);
+	$r = $st->execute();
+	
+	check_abort(r[0]['id']);
+	
+	$sql = "select status,turn from game where playerx='".$input['token']."' or playery='".$input['token']."'";
+	$st = $mysqli->prepare($sql);
+	$res = $st->execute();
+	print json_encode($res->fetch_all(MYSQLI_ASSOC), JSON_PRETTY_PRINT);
+}
 
-function show_status() {
+function show_status($input) {
 	
 	global $mysqli;
-	$sql = "select * from game where game_id=".$_SESSION['gameID'];
+	$sql = "select status from game where playerx='".$input['token']."' or playery='".$input['token']."'";
+	
 	$st = $mysqli->prepare($sql);
-
 	$st->execute();
 	$res = $st->get_result();
 
@@ -14,38 +51,52 @@ function show_status() {
 
 }
 
-function GameWon($piece)
-{
+function check_abort($id) {
+	global $mysqli;
+	
+	$sql = "update game set status='aborded', result=if(p_turn='W','B','W'),turn=null where p_turn is not null and last_change<(now()-INTERVAL 5 MINUTE) and status='started' and ID=$id";
+	$st = $mysqli->prepare($sql);
+	$r = $st->execute();
 }
+
 
 function start_game()
 {
 	global $mysqli;
 	
-	$playerid=$_SESSION["Player"];
 	
-		$result = mysqli_query( $mysqli , "SELECT ID FROM game WHERE status='initialized'" );
-		$line = mysqli_fetch_row($result);
-		$info = array();
-
-		if(!isset($line[0]))
+		
+		$sql = "select count(*) as count FROM game WHERE status='initialized'";
+		$st = $mysqli->prepare($sql);
+		$res = $st->get_result();
+		$r = $res->fetch_all(MYSQLI_ASSOC);
+		
+		if($r[0]['count']==0)
 		{
-			$sql="INSERT INTO game( playerx , status) VALUES ( '$playerid ', 'initialized')";
+			$sql="INSERT INTO game( playerx , status) VALUES ( '".$input['token']."', 'initialized')";
 			$mysqli->query($sql);
-			$id = $mysqli->insert_id;
-			$info["gameID"]=$id;
-			$info["XO"]="X";
+			$id=$mysqli->insert_id;
+			$piece="X";
 		}
 		else
 		{
-			$sql="UPDATE game SET status='started', playery='$playerid' where id=$line[0]";
-			$id=$line[0];
-			$mysqli->query($sql);
-			$info["gameID"]=$id;
-			$info["XO"]="O";
+			$sql = "select ID as activegameID FROM game WHERE status='initialized'";
+			$st = $mysqli->prepare($sql);
+			$res = $st->get_result();
+			$r = $res->fetch_all(MYSQLI_ASSOC);
+			
+			$id=$r[0]['activegameID'];
+			
+			$sql="UPDATE game SET status='started', playery='".$input['token']."' where id=$id";
+			$st = $mysqli->prepare($sql);
+			$r = $st->execute();
+			$piece="O";
 		}
-			$_SESSION["gameID"]=$info["gameID"];
-			$_SESSION["XO"]=$info["XO"];
-			echo json_encode($info);
+		
+		$info["gameid"]=$id;
+		$info["piece"]=$piece;
+		header('Content-type: application/json');
+		print json_encode($info[], JSON_PRETTY_PRINT);
+			
 	}
 ?>

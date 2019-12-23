@@ -1,38 +1,50 @@
 <?php 
-session_start();
-global $mysqli;
 
-function handleLogin($name)
+function handleLogin($input)
 {
-	$sql="SELECT $id FROM players WHERE name=$name";
-	$result = mysqli_query( $mysqli , $sql );
-	$player = mysqli_fetch_row($result);
-	if (!isset($player[0]))
-	{
-		$sql="INSERT INTO players( name ) VALUES ('$name')";
-		$mysqli->query($sql);
-		$id = $mysqli->insert_id;
-		$_SESSION["Player"]=$id;
+	if(!isset($input['username'])) {
+		header("HTTP/1.1 400 Bad Request");
+		print json_encode(['errormesg'=>"No username given."]);
+		exit;
+	}
+	$username=$input['username'];
+	
+	global $mysqli;
+	$sql = "select count(*) as count from players where username='".$username."'";
+	$st = $mysqli->prepare($sql);
+	$st->execute();
+	$res = $st->get_result();
+	$r = $res->fetch_all(MYSQLI_ASSOC);
+
+	if($res[0]['count']>0) {
+			$sql = "update players set token=md5(CONCAT( ?, NOW())) where username='".$username."'";
 	}
 	else
-		$_SESSION["Player"]=$player[0];
+		$sql = "INSERT INTO players( name, token) VALUES ( '$username', md5(CONCAT( ?, NOW())))";
+	
+	$st2 = $mysqli->prepare($sql);
+	$st2->execute();
+	
+	$sql = "select token from players where name='".$username."'";
+	
+	$st = $mysqli->prepare($sql);
+	$st->execute();
+	$res = $st->get_result();
+	header('Content-type: application/json');
+	print json_encode($res->fetch_all(MYSQLI_ASSOC), JSON_PRETTY_PRINT);
+
 }
+
 function handleUser($method,$request,$input)
 {
 	switch ($method)
 	{
-		case 'GET':	
-					if ($request=='')
-						show_users();
-					else show_user($request);
+		case 'GET':show_user($input);
 					break;
-		case 'POST':
+		case 'PUT':
 					switch (array_shift($request))
 					{
-						case 'login':	handleLogin();
-										break;
-						case 'update':
-										updateUser(array_shift($request),$request);
+						case 'login':	handleLogin($input);
 										break;
 						default: 		header("HTTP/1.1 404 Not Found");		
 					}
@@ -42,24 +54,7 @@ function handleUser($method,$request,$input)
 	}
 	
 }
-function updateUser($var,$request)
-{
-	$sql="SELECT won,lost FROM players WHERE id=".$_SESSION["Player"];
-	$result = mysqli_query( $mysqli , $sql );
-	$info = mysqli_fetch_row($result);
-	
-	switch($var)
-	{
-		case 'won': 	$sql="UPDATE game SET won=".info[0]+1;
-						$mysqli->query($sql);
-						break;
-		case 'lost': 	$sql="UPDATE game SET won=".info[1]+1;
-						$mysqli->query($sql);
-						break;
-		default:		header("HTTP/1.1 400 Bad Request");
-	}	
-	
-}
+
 function show_users() {
 	
 	global $mysqli;
@@ -68,15 +63,20 @@ function show_users() {
 
 	$st->execute();
 	$res = $st->get_result();
+	
 
 	header('Content-type: application/json');
 	print json_encode($res->fetch_all(MYSQLI_ASSOC), JSON_PRETTY_PRINT);
 
 }
-function show_user($request)
+
+function show_user($input)
 {
 	global $mysqli;
-	$sql = "select * from players where id=$request";
+	
+	$token=$input['token'];
+	
+	$sql = "select * from players where token='$token'";
 	$st = $mysqli->prepare($sql);
 
 	$st->execute();
