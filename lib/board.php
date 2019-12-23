@@ -18,6 +18,8 @@ function show_board($input) {
 
 function play_pos($x,$y,$input) 
 {
+	global $mysqli;
+	
 	$sql = "select ID as activegameID from game where (playerx='".$input['token']."' or playery='".$input['token']."') and status='started'";
 	$st = $mysqli->prepare($sql);
 	$st->execute();
