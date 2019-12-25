@@ -10,7 +10,7 @@ function show_board($input) {
 	$res = $st->get_result();
 	$r = $res->fetch_all(MYSQLI_ASSOC);
 	
-	$sql= "SELECT posX,posY FROM moves WHERE game=".r[0]['activegameID'];
+	$sql= "SELECT posX,posY,piece FROM moves WHERE game=".r[0]['activegameID'];
 	header('Content-type: application/json');
 	print json_encode($res->fetch_all(MYSQLI_ASSOC), JSON_PRETTY_PRINT);   
       

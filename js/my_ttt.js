@@ -64,7 +64,7 @@ function printTable() // emfanizei ton pinaka me oti move exei ginei kai ta apot
 }
 				
 			
-function playPos(x,y) // Paizei to position pou tou dothike kai enimerwnei ton pinaka 
+/*function playPos(x,y) // Paizei to position pou tou dothike kai enimerwnei ton pinaka 
 {	
     $.post("lib/playPos.php",
     {
@@ -76,7 +76,7 @@ function playPos(x,y) // Paizei to position pou tou dothike kai enimerwnei ton p
     {});	
 				
     printTable();
-}
+}*/
 			
 function getTurn() // pairnei to turn to game to game id dinete me session
 {	
@@ -101,6 +101,3 @@ function dropGame() // kanei unset to gameID session kai thetei to game se ended
 {
     $.ajax({url: "lib/dropGame.php"});
 }
-
-
-
