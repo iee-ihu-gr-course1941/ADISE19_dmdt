@@ -4,6 +4,7 @@ require_once "lib/dbconnect.php";
 require_once "lib/board.php";
 require_once "lib/game.php";
 require_once "lib/users.php";
+require_once "lib/chat.php";
 
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -32,6 +33,8 @@ switch ($r=array_shift($request)) {
 			break;
 	case 'players': handle_player($method, $request,$input);
             break;
+	case 'chat': handle_chat($method,$input);
+			break;
     default:  header("HTTP/1.1 404 Not Found");
                         exit;
 }
@@ -70,5 +73,16 @@ function handle_player($method, $request,$input) {
                  break;
 	}
 }
- 
+
+function handle_chat($method,$input){
+	switch ($method){
+	case 'POST':	postInChat($input);
+	case 'GET':		getChat();
+					break;
+	default:		header("HTTP/1.1 400 Bad Request"); 
+					print json_encode(['errormesg'=>"Method $method not allowed here."]);	
+	}
+}
+
+
 ?>

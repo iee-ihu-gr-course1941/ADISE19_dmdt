@@ -3,6 +3,7 @@ var game_status={};
 var board={};
 var last_update=new Date().getTime();
 var timer=null;
+$("#chat").hide();
 
 $(function () {
 	draw_empty_board();
@@ -12,6 +13,10 @@ $(function () {
     $('#reset').click( reset_board);
     $('#do_move').click( do_move);
 	$('#move_div').hide();
+	$("#msg").on('keypress',function(e){
+    	if(e.which == 13)
+        chathandle("post");
+    });
 	game_status_update();
 
 });
@@ -70,6 +75,7 @@ function login_to_game() {
 			data: JSON.stringify( {username: $('#username').val(), piece: piece}),
 			success: login_result,
 			error: login_error});
+	startchat();
 }
 
 
@@ -148,4 +154,43 @@ function do_move() {
 function move_result(data){
 	game_status_update();
 	fill_board_by_data(data);
+}
+
+function chathandle(e){
+    if(e=="post" && $("#msg").val()!="")
+		$.ajax({url: "triliza.php/chat", 
+			method: 'POST',
+			dataType: "json",
+			contentType: 'application/json',
+			data: JSON.stringify( {username: me.piece, msg:$("#msg").val()}),
+			headers: {"X-Token": me.token},
+			success: loadchat,
+			error: chat_error});
+	
+	if(e=="refresh")
+		$.ajax({url: "triliza.php/chat", 
+			method: 'GET',
+			dataType: "json",
+			contentType: 'application/json',
+			headers: {"X-Token": me.token},
+			success: loadchat,
+			error: chat_error});
+}
+
+function loadchat(data){
+	var inchat="";
+	for(var i=0;i<data.length;i++) {
+		var o = data[i];
+		var msg=o.username+": "+o.msg+"<br>";
+		inchat+=msg;
+	}
+	$("#outputchat").html(inchat);
+}
+function chat_error(data) {
+	var x = data.responseJSON;
+	$("#outputchat").html(x.errormesg);
+}
+function startchat(){
+	$("#chat").show( 2000 );
+	var interval = setInterval(chathandle("refresh"), 2000);
 }
