@@ -30,6 +30,7 @@ function draw_empty_board() {
 	t+='</table>';
 	
 	$('#board').html(t);
+    $('.square').click(click_on_piece);
 }
 
 function fill_board() {
@@ -148,4 +149,15 @@ function do_move() {
 function move_result(data){
 	game_status_update();
 	fill_board_by_data(data);
+}
+
+function click_on_piece(e) {
+	var o=e.target;
+	if(o.tagName!='TD') {o=o.parentNode;}
+	if(o.tagName!='TD') {return;}
+	
+	var id=o.id;
+	var a=id.split(/_/);
+	$('#the_move').val(a[1]+' ' +a[2]);
+	do_move();
 }
