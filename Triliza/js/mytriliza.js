@@ -14,8 +14,8 @@ $(function () {
     $('#do_move').click( do_move);
 	$('#move_div').hide();
 	$("#msg").on('keypress',function(e){
-    	if(e.which == 13)
-        chathandle("post");
+    	if(e.which ==13)
+			chathandle("post");
     });
 	game_status_update();
 
@@ -35,6 +35,7 @@ function draw_empty_board() {
 	t+='</table>';
 	
 	$('#board').html(t);
+    $('.square').click(click_on_piece);
 }
 
 function fill_board() {
@@ -193,4 +194,14 @@ function chat_error(data) {
 function startchat(){
 	$("#chat").show( 2000 );
 	var interval = setInterval(chathandle("refresh"), 2000);
+}
+function click_on_piece(e) {
+	var o=e.target;
+	if(o.tagName!='TD') {o=o.parentNode;}
+	if(o.tagName!='TD') {return;}
+	
+	var id=o.id;
+	var a=id.split(/_/);
+	$('#the_move').val(a[1]+' ' +a[2]);
+	do_move();
 }
