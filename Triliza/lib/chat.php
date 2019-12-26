@@ -2,16 +2,16 @@
 
 function postInChat($input)
 {
-	global $mysql;
+	global $mysqli;
 	
 	$sql="INSERT INTO chat (username, msg) VALUES (".$input["username"].",".$input["msg"].")";
 	$st = $mysqli->prepare($sql);
 	$r = $st->execute();
 }
 
-function getChat($input)
+function getChat()
 {
-	global $mysql;
+	global $mysqli;
 	
 	$sql="SELECT  username,msg FROM chat LIMIT 6;";
 	$st = $mysqli->prepare($sql);

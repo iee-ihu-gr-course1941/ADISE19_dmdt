@@ -3,7 +3,7 @@ var game_status={};
 var board={};
 var last_update=new Date().getTime();
 var timer=null;
-$("#chat").hide();
+var chatinterval=null;
 
 $(function () {
 	draw_empty_board();
@@ -13,15 +13,10 @@ $(function () {
     $('#reset').click( reset_board);
     $('#do_move').click( do_move);
 	$('#move_div').hide();
-	$("#msg").on('keypress',function(e){
-    	if(e.which ==13)
-			chathandle("post");
-    });
+	$('#chat').hide();
 	game_status_update();
-
+	$("#msgbtn").click( sendChat);
 });
-
-
 
 function draw_empty_board() {
 	var t='<table id="table">';
@@ -157,22 +152,23 @@ function move_result(data){
 	fill_board_by_data(data);
 }
 
-function chathandle(e){
-    if(e=="post" && $("#msg").val()!="")
-		$.ajax({url: "triliza.php/chat", 
-			method: 'POST',
-			dataType: "json",
-			contentType: 'application/json',
-			data: JSON.stringify( {username: me.piece, msg:$("#msg").val()}),
-			headers: {"X-Token": me.token},
-			success: loadchat,
-			error: chat_error});
-	
-	if(e=="refresh")
+function getChat(){
 		$.ajax({url: "triliza.php/chat", 
 			method: 'GET',
 			dataType: "json",
 			contentType: 'application/json',
+			headers: {"X-Token": me.token},
+			success: loadchat,
+			error: chat_error});
+}
+
+function sendChat()
+{
+	$.ajax({url: "triliza.php/chat", 
+			method: 'POST',
+			dataType: "json",
+			contentType: 'application/json',
+			data: JSON.stringify( {username: me.piece, msg:$("#msg").val()}),
 			headers: {"X-Token": me.token},
 			success: loadchat,
 			error: chat_error});
@@ -193,8 +189,12 @@ function chat_error(data) {
 }
 function startchat(){
 	$("#chat").show( 2000 );
-	var interval = setInterval(chathandle("refresh"), 2000);
+	chatinterval = setInterval(function() { getChat();}, 4000);
 }
+
+
+
+
 function click_on_piece(e) {
 	var o=e.target;
 	if(o.tagName!='TD') {o=o.parentNode;}
