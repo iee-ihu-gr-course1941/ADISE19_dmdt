@@ -1,11 +1,12 @@
 <?php 
 
-function postInChat($input)
+	function postInChat($input)
 {
 	global $mysqli;
 	
-	$sql="INSERT INTO chat (username, msg) VALUES (".$input["username"].",".$input["msg"].")";
+	$sql='INSERT INTO chat (username, msg) VALUES (?,?)';
 	$st = $mysqli->prepare($sql);
+	$st->bind_param('ss',$input['username'],$input['msg']);
 	$r = $st->execute();
 }
 

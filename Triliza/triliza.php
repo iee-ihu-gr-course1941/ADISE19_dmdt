@@ -76,7 +76,7 @@ function handle_player($method, $request,$input) {
 
 function handle_chat($method,$input){
 	switch ($method){
-	case 'POST':	postInChat($input);
+	case 'PUT':	postInChat($input);
 	case 'GET':		getChat();
 					break;
 	default:		header("HTTP/1.1 400 Bad Request"); 

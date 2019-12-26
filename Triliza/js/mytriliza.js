@@ -165,7 +165,7 @@ function getChat(){
 function sendChat()
 {
 	$.ajax({url: "triliza.php/chat", 
-			method: 'POST',
+			method: 'PUT',
 			dataType: "json",
 			contentType: 'application/json',
 			data: JSON.stringify( {username: me.piece, msg:$("#msg").val()}),

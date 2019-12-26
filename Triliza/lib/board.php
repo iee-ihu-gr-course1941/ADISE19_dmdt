@@ -6,7 +6,6 @@ function show_board() {
 	
 	$sql = 'select * from board';
 	$st = $mysqli->prepare($sql);
-
 	$st->execute();
 	$res = $st->get_result();
 
