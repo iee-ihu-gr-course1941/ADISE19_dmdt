@@ -1,13 +1,18 @@
 var me={token:null,piece:null};
 var game_status={};
-
+var board={};
+var last_update=new Date().getTime();
+var timer=null;
 
 $(function () {
 	draw_empty_board();
+    fill_board();
+    
     $('#login').click( login_to_game);
     $('#reset').click( reset_board);
     $('#do_move').click( do_move);
-		game_status_update();
+	$('#move_div').hide();
+	game_status_update();
 
 });
 
@@ -18,7 +23,7 @@ function draw_empty_board() {
 	for(var i=1;i<4;i++) {
 		t += '<tr>';
 		for(var j=1;j<4;j++) {
-			t += '<td class="square" id="square_'+j+'_'+i+'">' + j +','+i+'</td>'; 
+			t += '<td class="square" id="square_'+i+'_'+j+'">' + i +','+j+'</td>'; 
 		}
 		t+='</tr>';
 	}
@@ -27,11 +32,27 @@ function draw_empty_board() {
 	$('#board').html(t);
 }
 
+function fill_board() {
+	$.ajax({url: "triliza.php/board/", 
+		headers: {"X-Token": me.token},
+		success: fill_board_by_data });
+}
 
 function reset_board() {
-	$.ajax({url: "triliza.php/board/", method: 'POST'});
+	$.ajax({url: "triliza.php/board/", method: 'POST',  success: fill_board_by_data});
 	$('#move_div').hide();
 	$('#game_initializer').show(2000);
+}
+
+function fill_board_by_data(data) {
+	board=data;
+	for(var i=0;i<data.length;i++) {
+		var o = data[i];
+		var id = '#square_'+ o.x +'_' + o.y;
+		var c = (o.piece!=null)?o.piece:'';
+		var im = (o.piece!=null)?'<img class="piece '+c+'" src="images/'+c+'.png">':'';
+		$(id).addClass(o.b_color+'_square').html(im);
+	}
 }
 
 function login_to_game() {
@@ -40,6 +61,7 @@ function login_to_game() {
 		return;
 	}
 	var piece = $('#piece').val();
+    fill_board();
     
 	$.ajax({url: "triliza.php/players/"+piece, 
 			method: 'PUT',
@@ -71,17 +93,23 @@ function game_status_update() {
 
 
 function update_status(data) {
+	last_update=new Date().getTime();
+	var game_stat_old = game_status;
 	game_status=data[0];
 	update_info();
+	clearTimeout(timer);
 	if(game_status.p_turn==me.piece &&  me.piece!=null) {
 		x=0;
 		// do play
+		if(game_stat_old.p_turn!=game_status.p_turn) {
+			fill_board();
+		}
 		$('#move_div').show(1000);
-		setTimeout(function() { game_status_update();}, 15000);
+		timer=setTimeout(function() { game_status_update();}, 15000);
 	} else {
 		// must wait for something
 		$('#move_div').hide(1000);
-		setTimeout(function() { game_status_update();}, 4000);
+		timer=setTimeout(function() { game_status_update();}, 4000);
 	}
  	
 }
@@ -99,6 +127,13 @@ function do_move() {
 		alert('Must give 2 numbers');
 		return;
 	}
+    if(a[0]>3 || a[0]<1 ){
+        alert("out of bounds");
+        return;
+    }
+    if(a[1]>3 || a[1]<1 ){
+        alert("out of bounds")
+    }
 	$.ajax({url: "triliza.php/board/piece/"+a[0]+'/'+a[1], 
 			method: 'PUT',
 			dataType: "json",
@@ -111,6 +146,6 @@ function do_move() {
 }
 
 function move_result(data){
-	
-	$('#move_div').hide(1000);
+	game_status_update();
+	fill_board_by_data(data);
 }
