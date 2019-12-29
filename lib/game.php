@@ -1,48 +1,11 @@
 <?php
-function findPlayerPiece($token)
-{
-	$sql = "select count(*) as count from game where (playerx='".$input['token']."' and status='started'";
-	$st = $mysqli->prepare($sql);
-	$res = $st->get_result();
-	$r = $res->fetch_all(MYSQLI_ASSOC);
-	if (r[0]['count']>0)
-		return "X";
-	$sql = "select count(*) as count from game where (playery='".$input['token']."' and status='started'";
-	$st = $mysqli->prepare($sql);
-	$res = $st->get_result();
-	$r = $res->fetch_all(MYSQLI_ASSOC);
-	if (r[0]['count']>0)
-		return "Y";
-}
-function wonGame($input)
-{
-	$sql="update game set status='ended',result='".findPlayerPiece($input['token'])."'";
-	$st = $mysqli->prepare($sql);
-	$r = $st->execute();
-}
-function gameupdate($input)
-{
+//epistrefei status se json
+function show_status() {
+	
 	global $mysqli;
-	
-	
-	$sql = "select count(*) as count,id from game where (playerx='".$input['token']."' or playery='".$input['token']."') and status='started'";
+	$sql = 'select * from game_status';
 	$st = $mysqli->prepare($sql);
-	$r = $st->execute();
-	
-	check_abort(r[0]['id']);
-	
-	$sql = "select status,turn from game where playerx='".$input['token']."' or playery='".$input['token']."'";
-	$st = $mysqli->prepare($sql);
-	$res = $st->execute();
-	print json_encode($res->fetch_all(MYSQLI_ASSOC), JSON_PRETTY_PRINT);
-}
 
-function show_status($input) {
-	
-	global $mysqli;
-	$sql = "select status from game where playerx='".$input['token']."' or playery='".$input['token']."'";
-	
-	$st = $mysqli->prepare($sql);
 	$st->execute();
 	$res = $st->get_result();
 
@@ -51,52 +14,82 @@ function show_status($input) {
 
 }
 
-function check_abort($id) {
+function check_abort() {
 	global $mysqli;
 	
-	$sql = "update game set status='aborded', result=if(p_turn='X','O','X'),turn=null where p_turn is not null and last_change<(now()-INTERVAL 5 MINUTE) and status='started' and ID=$id";
+	$sql = "update game_status set status='aborded', result=if(p_turn='X','O','X'),p_turn=null where p_turn is not null and last_change<(now()-INTERVAL 5 MINUTE) and status='started'";
 	$st = $mysqli->prepare($sql);
 	$r = $st->execute();
 }
 
 
-function start_game($input)
-{
+//epistrefei to status
+function read_status() {
 	global $mysqli;
 	
+	$sql = 'select * from game_status';
+	$st = $mysqli->prepare($sql);
+
+	$st->execute();
+	$res = $st->get_result();
+	$status = $res->fetch_assoc();
+	return($status);
+}
+
+//kanei udate to status
+function update_game_status() {
+	global $mysqli;
 	
-		
-		$sql = "select count(*) as count FROM game WHERE status='initialized'";
-		$st = $mysqli->prepare($sql);
-		$res = $st->get_result();
-		$r = $res->fetch_all(MYSQLI_ASSOC);
-		
-		if($r[0]['count']==0)
-		{
-			$sql="INSERT INTO game( playerx , status) VALUES ( '".$input['token']."', 'initialized')";
-			$mysqli->query($sql);
-			$id=$mysqli->insert_id;
-			$piece="X";
+	$sql = 'select * from game_status';
+	$st = $mysqli->prepare($sql);
+	$st->execute();
+	$res = $st->get_result();
+	$status = $res->fetch_assoc();
+	
+	
+	$new_status=null;
+	$new_turn=null;
+	
+	$st3=$mysqli->prepare('select count(*) as aborted from players WHERE last_action< (NOW() - INTERVAL 1 MINUTE)');
+	$st3->execute();
+	$res3 = $st3->get_result();
+	$aborted = $res3->fetch_assoc()['aborted'];
+	if($aborted>0) {
+		$sql = "UPDATE players SET username=NULL, token=NULL WHERE last_action< (NOW() - INTERVAL 1 MINUTE)";
+		$st2 = $mysqli->prepare($sql);
+		$st2->execute();
+		if($status['status']=='started') {
+			$new_status='aborted';
 		}
-		else
-		{
-			$sql = "select ID as activegameID FROM game WHERE status='initialized'";
-			$st = $mysqli->prepare($sql);
-			$res = $st->get_result();
-			$r = $res->fetch_all(MYSQLI_ASSOC);
-			
-			$id=$r[0]['activegameID'];
-			
-			$sql="UPDATE game SET status='started', playery='".$input['token']."' where id=$id";
-			$st = $mysqli->prepare($sql);
-			$r = $st->execute();
-			$piece="O";
-		}
-		
-		$info["gameid"]=$id;
-		$info["piece"]=$piece;
-		header('Content-type: application/json');
-		print json_encode($info[], JSON_PRETTY_PRINT);
-			
 	}
+	
+	$sql = 'select count(*) as c from players where username is not null';
+	$st = $mysqli->prepare($sql);
+	$st->execute();
+	$res = $st->get_result();
+	$active_players = $res->fetch_assoc()['c'];
+	
+	
+	switch($active_players) {
+		case 0: $new_status='not active'; break;
+		case 1: $new_status='initialized'; break;
+		case 2: $new_status='started'; 
+				if($status['p_turn']==null) {
+					$new_turn='X'; 
+				}                
+	}
+	$sql = 'update game_status set status=?, p_turn=?';
+	$st = $mysqli->prepare($sql);
+	$st->bind_param('ss',$new_status,$new_turn);
+	$st->execute();
+	
+	
+	
+}
+
+
+
+
+
+
 ?>
