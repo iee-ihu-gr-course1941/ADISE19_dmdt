@@ -11,6 +11,7 @@ $(function () {
     
     $('#login').click( login_to_game);
     $('#reset').click( reset_board);
+	$('#rematch').click( rematch);
     $('#do_move').click( do_move);
 	$('#move_div').hide();
 	$('#chat').hide();
@@ -43,6 +44,10 @@ function reset_board() {
 	$.ajax({url: "triliza.php/board/", method: 'POST',  success: fill_board_by_data});
 	$('#move_div').hide();
 	$('#game_initializer').show(2000);
+}
+
+function rematch() {
+	$.ajax({url: "triliza.php/board/rematch", method: 'POST',  success: fill_board_by_data});	
 }
 
 function fill_board_by_data(data) {

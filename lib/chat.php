@@ -14,7 +14,7 @@ function getChat()
 {
 	global $mysqli;
 	
-	$sql="SELECT  username,msg FROM chat LIMIT 6;";
+	$sql="SELECT  username,msg FROM chat;";
 	$st = $mysqli->prepare($sql);
 	$st->execute();
 	$res = $st->get_result();

@@ -27,7 +27,12 @@ function read_piece($x,$y) {
 	return(null);
 }
 
-
+function rematch() {
+	global $mysqli;
+	
+	$sql = 'call rematch()';
+	$mysqli->query($sql);
+}
 
 function reset_board() {
 	global $mysqli;
