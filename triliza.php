@@ -20,9 +20,6 @@ switch ($r=array_shift($request)) {
                                 case '':
                                 case null: handle_board($method);
                                                 break;
-						 		case 'rematch': rematch();
-							 					show_board();
-							 					break;
                                 case 'piece': handle_piece($method, $request[0],$request[1],$input);
                                                 break;
                                 
