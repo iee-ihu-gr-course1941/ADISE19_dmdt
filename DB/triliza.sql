@@ -3,7 +3,11 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
+<<<<<<< HEAD
 -- Generation Time: Jan 09, 2020 at 11:49 PM
+=======
+-- Generation Time: Jan 09, 2020 at 09:58 PM
+>>>>>>> 4e796f436af28fe740ac1500349ee57b9d94a10f
 -- Server version: 10.4.8-MariaDB
 -- PHP Version: 7.3.11
 
@@ -131,9 +135,15 @@ CREATE TABLE `board` (
 INSERT INTO `board` (`x`, `y`, `piece`) VALUES
 (1, 1, NULL),
 (1, 2, NULL),
+<<<<<<< HEAD
 (1, 3, 'X'),
 (2, 1, NULL),
 (2, 2, NULL),
+=======
+(1, 3, NULL),
+(2, 1, NULL),
+(2, 2, 'X'),
+>>>>>>> 4e796f436af28fe740ac1500349ee57b9d94a10f
 (2, 3, NULL),
 (3, 1, NULL),
 (3, 2, NULL),
@@ -203,7 +213,11 @@ CREATE TABLE `game_status` (
 --
 
 INSERT INTO `game_status` (`status`, `p_turn`, `result`, `last_change`) VALUES
+<<<<<<< HEAD
 ('started', 'O', NULL, '2020-01-09 22:48:20');
+=======
+('started', 'O', NULL, '2020-01-09 20:54:57');
+>>>>>>> 4e796f436af28fe740ac1500349ee57b9d94a10f
 
 --
 -- Triggers `game_status`
@@ -235,8 +249,13 @@ CREATE TABLE `players` (
 --
 
 INSERT INTO `players` (`username`, `piece`, `token`, `last_action`) VALUES
+<<<<<<< HEAD
 ('das', 'X', '2206eb7fb7a3cc7a13fc5fd72c92ed47', '2020-01-09 22:41:33'),
 ('das', 'O', 'cfe4948cc6d0da68f93bc6b9b6a2956c', '2020-01-09 22:41:32');
+=======
+('das', 'X', 'eb3664cccb9292ae05d19bdd3478312e', '2020-01-09 20:54:47'),
+('fsad', 'O', '58e2c83cee9d18d9c3ef3da459a0b590', '2020-01-09 20:54:48');
+>>>>>>> 4e796f436af28fe740ac1500349ee57b9d94a10f
 
 --
 -- Indexes for dumped tables
