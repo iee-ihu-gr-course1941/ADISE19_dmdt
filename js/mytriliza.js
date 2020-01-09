@@ -10,7 +10,8 @@ $(function () {
     fill_board();
     
     $('#login').click( login_to_game);
-    $('#reset').click( reset_board);
+    $('#reset').click( reset_board);	
+	$('#rematch').click( rematch);
     $('#do_move').click( do_move);
 	$('#move_div').hide();
 	$('#chat').hide();
@@ -44,6 +45,10 @@ function reset_board() {
 	$('#move_div').hide();
 	$('#game_initializer').show(2000);
 }
+function rematch() {
+	$.ajax({url: "triliza.php/board/rematch", method: 'POST',  success: fill_board_by_data});
+	
+}
 
 function fill_board_by_data(data) {
 	board=data;
@@ -54,6 +59,7 @@ function fill_board_by_data(data) {
 		var im = (o.piece!=null)?'<img class="piece '+c+'" src="images/'+c+'.png">':'';
 		$(id).addClass(o.b_color+'_square').html(im);
 	}
+	
 }
 
 function login_to_game() {

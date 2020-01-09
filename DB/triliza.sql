@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 26, 2019 at 11:48 PM
+-- Generation Time: Jan 09, 2020 at 11:49 PM
 -- Server version: 10.4.8-MariaDB
 -- PHP Version: 7.3.11
 
@@ -36,6 +36,14 @@ WHERE x=x1 AND y=y1;
 update game_status set p_turn=if(p='X','O','X');
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `checkW` ()  NO SQL
+BEGIN
+
+CALL draw();
+Call check_win();
+
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `check_win` ()  BEGIN
 	declare  c11,c12,c13,c21,c22,c23,c31,c32,c33 char;
     
@@ -53,8 +61,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `check_win` ()  BEGIN
     OR (c21=c22 AND c22=c23)
     OR (c31=c32 AND c32=c33)
     OR (c11=c21 AND c21=c31)
-    OR (c21=c22 AND c22=c23)
-    OR (c31=c32 AND c32=c33)
+    OR (c12=c22 AND c22=c32)
+    OR (c13=c23 AND c23=c33)
     OR (c11=c22 AND c22=c33)
     OR (c31=c22 AND c22=c13)    
     THEN
@@ -62,6 +70,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `check_win` ()  BEGIN
     set status = 'ended';
     UPDATE game_status
     set result=if(p_turn='X','X','O');
+        
     end if; 
     
     
@@ -78,6 +87,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `clean_board` ()  BEGIN
 replace into board select * from board_empty;
 	update `players` set username=null, token=null;
 	update `game_status` set `status`='not active', `p_turn`=null, `result`=null;
+    TRUNCATE chat;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `draw` ()  BEGIN
@@ -92,6 +102,13 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `draw` ()  BEGIN
     end if;
     
     END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `rematch` ()  NO SQL
+BEGIN
+
+replace into board select * from board_empty;
+	update `game_status` set `status`='started', `p_turn`='X', `result`=null;
+END$$
 
 DELIMITER ;
 
@@ -112,25 +129,21 @@ CREATE TABLE `board` (
 --
 
 INSERT INTO `board` (`x`, `y`, `piece`) VALUES
-(1, 1, 'X'),
-(1, 2, 'O'),
+(1, 1, NULL),
+(1, 2, NULL),
 (1, 3, 'X'),
-(2, 1, 'X'),
-(2, 2, 'O'),
-(2, 3, 'O'),
-(3, 1, 'O'),
-(3, 2, 'X'),
-(3, 3, 'X');
+(2, 1, NULL),
+(2, 2, NULL),
+(2, 3, NULL),
+(3, 1, NULL),
+(3, 2, NULL),
+(3, 3, NULL);
 
 --
 -- Triggers `board`
 --
 DELIMITER $$
-CREATE TRIGGER `checkdraw` AFTER UPDATE ON `board` FOR EACH ROW call draw()
-$$
-DELIMITER ;
-DELIMITER $$
-CREATE TRIGGER `checkwinining` AFTER UPDATE ON `board` FOR EACH ROW CALL check_win()
+CREATE TRIGGER `winning` AFTER UPDATE ON `board` FOR EACH ROW call checkW()
 $$
 DELIMITER ;
 
@@ -190,7 +203,7 @@ CREATE TABLE `game_status` (
 --
 
 INSERT INTO `game_status` (`status`, `p_turn`, `result`, `last_change`) VALUES
-('ended', 'O', 'D', '2019-12-26 22:22:58');
+('started', 'O', NULL, '2020-01-09 22:48:20');
 
 --
 -- Triggers `game_status`
@@ -222,8 +235,8 @@ CREATE TABLE `players` (
 --
 
 INSERT INTO `players` (`username`, `piece`, `token`, `last_action`) VALUES
-('dffsda', 'X', '08c83eb83072642ab852a41aa2ffb8c5', '2019-12-26 22:22:31'),
-('dffsda', 'O', 'c086e89145cb260274236e7a552c8bbb', '2019-12-26 22:22:30');
+('das', 'X', '2206eb7fb7a3cc7a13fc5fd72c92ed47', '2020-01-09 22:41:33'),
+('das', 'O', 'cfe4948cc6d0da68f93bc6b9b6a2956c', '2020-01-09 22:41:32');
 
 --
 -- Indexes for dumped tables

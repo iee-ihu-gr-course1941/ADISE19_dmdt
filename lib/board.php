@@ -36,6 +36,13 @@ function reset_board() {
 	$mysqli->query($sql);
 }
 
+function rematch() {
+	global $mysqli;
+	
+	$sql = 'call rematch()';
+	$mysqli->query($sql);
+}
+
 
 
 function read_board() {
