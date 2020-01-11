@@ -4,7 +4,7 @@ $db = 'triliza_db';
 
 
 $user='root';
-$pass='pokemon1';
+$pass='';
 
 
 if(gethostname()=='users.iee.ihu.gr') {
