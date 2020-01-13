@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 09, 2020 at 11:49 PM
+-- Generation Time: Jan 13, 2020 at 05:54 PM
 -- Server version: 10.4.8-MariaDB
 -- PHP Version: 7.3.11
 
@@ -26,6 +26,30 @@ DELIMITER $$
 --
 -- Procedures
 --
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addwins` ()  NO SQL
+BEGIN
+	declare  res char;
+    
+    select  result into res FROM `game_status`;
+    
+    
+    IF res='X'   
+    THEN
+    UPDATE game_status
+    set Xwins = (Xwins+1);
+               
+    end if;
+    
+    IF res='O'   
+    THEN
+    UPDATE game_status
+    set Owins = (Owins+1);
+   
+            
+    end if;
+    
+    END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `add_piece` (IN `x1` TINYINT, IN `y1` TINYINT, IN `p` ENUM('X','O'))  BEGIN
 
 
@@ -41,6 +65,7 @@ BEGIN
 
 CALL draw();
 Call check_win();
+call addwins();
 
 END$$
 
@@ -88,6 +113,7 @@ replace into board select * from board_empty;
 	update `players` set username=null, token=null;
 	update `game_status` set `status`='not active', `p_turn`=null, `result`=null;
     TRUNCATE chat;
+    update `game_status` set Xwins=0, Owins=0;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `draw` ()  BEGIN
@@ -131,7 +157,7 @@ CREATE TABLE `board` (
 INSERT INTO `board` (`x`, `y`, `piece`) VALUES
 (1, 1, NULL),
 (1, 2, NULL),
-(1, 3, 'X'),
+(1, 3, NULL),
 (2, 1, NULL),
 (2, 2, NULL),
 (2, 3, NULL),
@@ -185,6 +211,14 @@ CREATE TABLE `chat` (
   `msg` varchar(200) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data for table `chat`
+--
+
+INSERT INTO `chat` (`username`, `msg`) VALUES
+('X', 'dsadsadsa'),
+('X', 'dsadsadsa');
+
 -- --------------------------------------------------------
 
 --
@@ -195,15 +229,17 @@ CREATE TABLE `game_status` (
   `status` enum('not active','initialized','started','ended','aborded') NOT NULL DEFAULT 'not active',
   `p_turn` enum('X','O') DEFAULT NULL,
   `result` enum('X','O','D') DEFAULT NULL,
-  `last_change` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `last_change` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `Xwins` int(3) NOT NULL DEFAULT 0,
+  `Owins` int(3) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `game_status`
 --
 
-INSERT INTO `game_status` (`status`, `p_turn`, `result`, `last_change`) VALUES
-('started', 'O', NULL, '2020-01-09 22:48:20');
+INSERT INTO `game_status` (`status`, `p_turn`, `result`, `last_change`, `Xwins`, `Owins`) VALUES
+('initialized', NULL, NULL, '2020-01-13 16:54:19', 0, 0);
 
 --
 -- Triggers `game_status`
@@ -235,8 +271,8 @@ CREATE TABLE `players` (
 --
 
 INSERT INTO `players` (`username`, `piece`, `token`, `last_action`) VALUES
-('das', 'X', '2206eb7fb7a3cc7a13fc5fd72c92ed47', '2020-01-09 22:41:33'),
-('das', 'O', 'cfe4948cc6d0da68f93bc6b9b6a2956c', '2020-01-09 22:41:32');
+('dasd', 'X', '0b7e8473284c5ff55c5538e1f327c10a', '2020-01-13 16:54:19'),
+(NULL, 'O', NULL, '2020-01-13 16:47:50');
 
 --
 -- Indexes for dumped tables
